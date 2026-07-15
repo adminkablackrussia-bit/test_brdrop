@@ -1,0 +1,2263 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Админка кейсов</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .admin-page {
+      min-height: 100vh;
+      background: linear-gradient(180deg, #08101d 0%, #060813 100%);
+      color: var(--text);
+      padding: 24px 14px 40px;
+    }
+
+    .admin-shell {
+      max-width: 1220px;
+      margin: 0 auto;
+      display: grid;
+      gap: 20px;
+    }
+
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px;
+      padding: 18px 20px;
+      border-radius: 24px;
+      background: rgba(10, 17, 30, 0.92);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.35);
+    }
+
+    .admin-heading {
+      margin: 0;
+      font-size: clamp(1.6rem, 2.3vw, 2.4rem);
+    }
+
+    .admin-panel {
+      display: grid;
+      gap: 20px;
+    }
+
+    .admin-form,
+    .admin-preview {
+      background: rgba(8, 13, 22, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 24px;
+      box-shadow: 0 24px 60px rgba(0,0,0,0.28);
+      padding: 26px;
+    }
+
+    .admin-form label,
+    .admin-form legend {
+      display: block;
+      color: var(--muted);
+      margin-bottom: 8px;
+      font-size: 0.94rem;
+    }
+
+    .admin-form input,
+    .admin-form select,
+    .admin-form textarea {
+      width: 100%;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text);
+      padding: 12px 14px;
+      margin-bottom: 16px;
+      font: inherit;
+    }
+
+    .admin-form textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .admin-grid {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .admin-grid-full {
+      grid-column: 1 / -1;
+    }
+
+    .admin-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+
+    .admin-actions button {
+      border: 0;
+      border-radius: 16px;
+      padding: 12px 18px;
+      color: var(--text);
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .section-header h2 {
+      margin: 0;
+      font-size: 1.2rem;
+    }
+
+    .section-toggle-btn {
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 16px;
+      padding: 10px 16px;
+      background: rgba(255,255,255,0.04);
+      color: var(--text);
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .admin-form.collapsed > :not(.section-header) {
+      display: none !important;
+    }
+
+    .admin-form.collapsed .section-toggle-btn {
+      background: rgba(255,255,255,0.08);
+    }
+
+    .admin-sort-controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: end;
+      margin-bottom: 14px;
+    }
+
+    .admin-sort-group {
+      display: grid;
+      gap: 6px;
+      min-width: 160px;
+    }
+
+    .admin-sort-group span {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .admin-sort-group select {
+      margin-bottom: 0;
+    }
+
+    .admin-card-list {
+      display: grid;
+      gap: 16px;
+    }
+
+    .admin-card {
+      display: grid;
+      gap: 10px;
+      padding: 18px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .admin-card h4 {
+      margin: 0;
+      font-size: 1rem;
+    }
+
+    .admin-card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .reward-row {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1fr 1fr 1fr 1fr auto;
+      align-items: start;
+    }
+
+    .reward-row label {
+      margin-bottom: 0;
+    }
+
+    .reward-row input {
+      margin-bottom: 0;
+    }
+
+    .reward-row button {
+      min-width: 64px;
+    }
+
+    .case-profit-panel {
+      margin-top: 18px;
+      padding: 16px 18px;
+      border-radius: 20px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .case-profit-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      align-items: start;
+    }
+
+    .case-profit-grid div {
+      display: grid;
+      gap: 6px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .case-profit-grid span {
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .case-profit-grid strong {
+      display: inline-block;
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+
+    .case-profit-status-neutral {
+      color: #cbd5e1;
+    }
+
+    .case-profit-status-ok {
+      color: #8ee07d;
+    }
+
+    .case-profit-status-low {
+      color: #ff9f7f;
+    }
+
+    .case-profit-status-high {
+      color: #7ac7ff;
+    }
+
+    .case-profit-status-high.case-profit-advice {
+      color: #ffd86f;
+    }
+
+    .reward-picker-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 60;
+    }
+
+    .reward-picker-modal.open {
+      display: grid;
+    }
+
+    .reward-picker-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.78);
+      backdrop-filter: blur(10px);
+    }
+
+    .reward-picker-card {
+      position: relative;
+      width: min(100%, 1080px);
+      max-height: min(100vh - 48px, 880px);
+      overflow: hidden;
+      background: rgba(9, 14, 22, 0.98);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 28px;
+      box-shadow: 0 32px 80px rgba(0, 0, 0, 0.35);
+      padding: 22px;
+      display: grid;
+      gap: 16px;
+      z-index: 1;
+    }
+
+    .reward-picker-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .reward-picker-header h3 {
+      margin: 0;
+      font-size: 1.4rem;
+    }
+
+    .reward-picker-close {
+      border: 0;
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      width: 46px;
+      height: 46px;
+      border-radius: 16px;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .reward-picker-controls {
+      display: grid;
+      gap: 14px;
+    }
+
+    .reward-picker-filter-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .reward-picker-filter-row label {
+      display: grid;
+      gap: 8px;
+      font-size: 0.92rem;
+    }
+
+    .reward-picker-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+      overflow: auto;
+      max-height: 520px;
+      padding-right: 6px;
+    }
+
+    .reward-picker-item {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.03);
+      color: var(--text);
+      text-align: left;
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+      min-height: 220px;
+    }
+
+    .reward-picker-item:hover {
+      transform: translateY(-2px);
+      border-color: rgba(255, 184, 77, 0.35);
+      background: rgba(255, 255, 255, 0.07);
+    }
+
+    .reward-picker-item.selected {
+      border-color: rgba(77, 212, 255, 0.65);
+      background: linear-gradient(180deg, rgba(77, 212, 255, 0.12), rgba(255, 255, 255, 0.04));
+    }
+
+    .reward-picker-item .item-thumb {
+      aspect-ratio: 1 / 1;
+      border-radius: 18px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.06);
+      display: grid;
+      place-items: center;
+    }
+
+    .reward-picker-item .item-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .reward-picker-item .item-name {
+      font-weight: 700;
+      font-size: 1rem;
+      line-height: 1.3;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .reward-picker-item .item-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .reward-picker-footer {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .reward-picker-selected-count {
+      color: #b6e8ff;
+      font-size: 0.95rem;
+    }
+
+    .picker-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .reward-picker-save,
+    .reward-picker-clear {
+      border: 0;
+      border-radius: 18px;
+      padding: 12px 18px;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .reward-picker-save {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: var(--text);
+    }
+
+    .reward-picker-clear {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--text);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .admin-preview pre {
+      margin: 0;
+      padding: 16px;
+      border-radius: 18px;
+      background: rgba(0, 0, 0, 0.32);
+      overflow-x: auto;
+      color: #d8e8ff;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+      line-height: 1.5;
+    }
+
+    .admin-items-panel,
+    .admin-news-panel {
+      display: grid;
+      gap: 16px;
+    }
+
+    .item-card {
+      display: grid;
+      gap: 14px;
+    }
+
+    .item-preview-shell {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: minmax(120px, 160px) 1fr;
+      align-items: start;
+    }
+
+    .item-preview {
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 22px;
+      border: 1px solid rgba(255,255,255,0.12);
+      background: rgba(255,255,255,0.04);
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      color: var(--muted);
+      font-size: 0.9rem;
+      text-align: center;
+      padding: 10px;
+    }
+
+    .item-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 16px;
+    }
+
+    .item-preview.is-empty img {
+      display: none;
+    }
+
+    .item-form-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .item-form-grid .admin-grid-full {
+      grid-column: 1 / -1;
+    }
+
+    @media (max-width: 900px) {
+      .item-preview-shell,
+      .item-form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 900px) {
+      .admin-grid,
+      .reward-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-page">
+    <div class="admin-shell">
+      <header class="admin-header">
+        <div>
+          <h1 class="admin-heading">Админка кейсов</h1>
+          <p style="margin: 8px 0 0; color: var(--muted);">Добавляй и редактируй кейсы, контролируй награды и экспортируй SQL.</p>
+        </div>
+        <a class="admin-link" href="index.html">Вернуться в приложение</a>
+      </header>
+
+      <section class="admin-panel">
+        <div class="admin-form" id="cases-panel">
+          <div class="section-header">
+            <h2>Кейсы</h2>
+            <button type="button" class="section-toggle-btn" id="toggle-cases-panel-btn" aria-expanded="true">Свернуть</button>
+          </div>
+          <div class="admin-actions">
+            <button id="add-case-btn" type="button">Добавить кейс</button>
+            <button id="save-cases-btn" type="button">Сохранить</button>
+            <button id="export-sql-btn" type="button">Экспорт SQL</button>
+            <button id="refresh-from-supabase-btn" type="button">Обновить из Supabase</button>
+          </div>
+
+          <div class="admin-sort-controls">
+            <label class="admin-sort-group">
+              <span>Кейсы по</span>
+              <select id="case-sort-field">
+                <option value="name">Названию</option>
+                <option value="price">Цене</option>
+                <option value="rarity">Редкости</option>
+                <option value="difficulty">Сложности</option>
+              </select>
+            </label>
+            <label class="admin-sort-group">
+              <span>Порядок</span>
+              <select id="case-sort-direction">
+                <option value="asc">По возрастанию</option>
+                <option value="desc">По убыванию</option>
+              </select>
+            </label>
+            <button id="sort-cases-btn" type="button">Сортировать кейсы</button>
+            <button id="sort-cases-price-asc-btn" type="button">Цена ↑</button>
+            <button id="sort-cases-price-desc-btn" type="button">Цена ↓</button>
+          </div>
+
+          <div id="cases-editor" class="admin-card-list"></div>
+        </div>
+
+
+
+        <div class="admin-form admin-items-panel" id="items-panel">
+          <div class="section-header">
+            <h2>Предметы</h2>
+            <button type="button" class="section-toggle-btn" id="toggle-items-panel-btn" aria-expanded="true">Свернуть</button>
+          </div>
+          <div class="admin-actions">
+            <button id="add-item-btn" type="button">Добавить предмет</button>
+            <button id="save-items-btn" type="button">Сохранить предметы</button>
+          </div>
+
+          <div class="admin-sort-controls">
+            <label class="admin-sort-group">
+              <span>Предметы по</span>
+              <select id="item-sort-field">
+                <option value="name">Названию</option>
+                <option value="price">Цене</option>
+                <option value="type">Типу</option>
+                <option value="rarity">Редкости</option>
+              </select>
+            </label>
+            <label class="admin-sort-group">
+              <span>Порядок</span>
+              <select id="item-sort-direction">
+                <option value="asc">По возрастанию</option>
+                <option value="desc">По убыванию</option>
+              </select>
+            </label>
+            <button id="sort-items-btn" type="button">Сортировать предметы</button>
+            <button id="sort-items-price-asc-btn" type="button">Цена ↑</button>
+            <button id="sort-items-price-desc-btn" type="button">Цена ↓</button>
+          </div>
+
+          <div id="items-editor" class="admin-card-list"></div>
+        </div>
+
+        <div class="admin-form admin-news-panel">
+          <div class="admin-actions">
+            <button id="add-news-btn" type="button">Добавить новость</button>
+            <button id="save-news-btn" type="button">Сохранить новости</button>
+          </div>
+
+          <div class="admin-sort-controls">
+            <label class="admin-sort-group">
+              <span>Новости по</span>
+              <select id="news-sort-field">
+                <option value="title">Заголовку</option>
+                <option value="pinned">Закреплённости</option>
+              </select>
+            </label>
+            <label class="admin-sort-group">
+              <span>Порядок</span>
+              <select id="news-sort-direction">
+                <option value="asc">По возрастанию</option>
+                <option value="desc">По убыванию</option>
+              </select>
+            </label>
+            <button id="sort-news-btn" type="button">Сортировать новости</button>
+          </div>
+
+          <div id="news-editor" class="admin-card-list"></div>
+        </div>
+
+        <div class="admin-preview">
+          <h2 style="margin-top: 0;">SQL-экспорт кейсов</h2>
+          <pre id="sql-output" aria-live="polite"></pre>
+        </div>
+
+        <div class="admin-preview">
+          <h2 style="margin-top: 0;">SQL-экспорт предметов</h2>
+          <pre id="items-sql-output" aria-live="polite"></pre>
+        </div>
+
+        <div class="admin-preview">
+          <h2 style="margin-top: 0;">SQL-экспорт новостей</h2>
+          <pre id="news-sql-output" aria-live="polite"></pre>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <div class="reward-picker-modal" id="reward-picker-modal" aria-hidden="true">
+    <div class="reward-picker-backdrop" data-action="close-reward-picker"></div>
+    <div class="reward-picker-card" role="dialog" aria-modal="true" aria-label="Выбор предметов для наград">
+      <div class="reward-picker-header">
+        <h3>Выберите предметы</h3>
+        <button type="button" class="reward-picker-close" data-action="close-reward-picker" aria-label="Закрыть">×</button>
+      </div>
+
+      <div class="reward-picker-controls">
+        <div class="reward-picker-filter-row">
+          <label>
+            Поиск
+            <input id="reward-picker-search" type="search" placeholder="Поиск по названию" />
+          </label>
+          <label>
+            Сортировка
+            <select id="reward-picker-sort-field">
+              <option value="name">A–Я</option>
+              <option value="price">По цене</option>
+              <option value="rarity">По редкости</option>
+            </select>
+          </label>
+          <label>
+            Направление
+            <select id="reward-picker-sort-direction">
+              <option value="asc">По возрастанию</option>
+              <option value="desc">По убыванию</option>
+            </select>
+          </label>
+          <label>
+            Редкость
+            <select id="reward-picker-filter-rarity">
+              <option value="all">Все</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div class="reward-picker-grid" id="reward-picker-grid"></div>
+
+      <div class="reward-picker-footer">
+        <span class="reward-picker-selected-count" id="reward-picker-selected-count">Выбрано: 0</span>
+        <div class="picker-actions">
+          <button type="button" class="reward-picker-clear" id="reward-picker-clear-btn">Сбросить</button>
+          <button type="button" class="reward-picker-save" id="reward-picker-save-btn">Сохранить</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const STORAGE_KEYS = {
+      cases: 'br_drop_cases',
+      items: 'br_drop_items',
+      news: 'br_drop_news',
+      rarityWeights: 'br_drop_rarity_weights'
+    };
+
+    const SUPABASE_URL = "https://rniavxontiwnxkivzirw.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJuaWF2eG9udGl3bnhraXZ6aXJ3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM3ODc4NDksImV4cCI6MjA5OTM2Mzg0OX0.YRZUnP5B7vIc_jZnQPw4_Rs4rWv14CJTk2c6Iwj4wI4";
+    const supabaseClient = window.supabase && SUPABASE_URL && SUPABASE_ANON_KEY && SUPABASE_URL !== 'YOUR_SUPABASE_URL' && SUPABASE_ANON_KEY !== 'YOUR_SUPABASE_ANON_KEY'
+      ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY)
+      : null;
+
+    let rarityWeights = loadRarityWeights();
+
+    function normalizeRarityValue(raw) {
+      const value = String(raw || '').trim();
+      if (!value) return 'Серый';
+      const normalized = value.toLowerCase();
+      if (['common', 'серый', 'gray'].includes(normalized)) return 'Серый';
+      if (['rare', 'зеленый', 'green'].includes(normalized)) return 'Зеленый';
+      if (['blue', 'синий'].includes(normalized)) return 'Синий';
+      if (['epic', 'фиолетовый', 'purple'].includes(normalized)) return 'Фиолетовый';
+      if (['legendary', 'золотой', 'gold'].includes(normalized)) return 'Золотой';
+      if (['mythic', 'мифический', 'red', 'красный'].includes(normalized)) return 'Красный';
+      return value;
+    }
+
+    function normalizeChanceObject(raw) {
+      const defaults = getDefaultRarityWeights();
+      if (!raw) {
+        return defaults;
+      }
+
+      let parsed = raw;
+      if (typeof parsed === 'string') {
+        try {
+          parsed = JSON.parse(parsed);
+        } catch {
+          return defaults;
+        }
+      }
+
+      if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+        return defaults;
+      }
+
+      const normalized = {};
+      const mapping = {
+        common: 'Серый',
+        rare: 'Зеленый',
+        epic: 'Фиолетовый',
+        legendary: 'Золотой',
+        gray: 'Серый',
+        green: 'Зеленый',
+        blue: 'Синий',
+        purple: 'Фиолетовый',
+        gold: 'Золотой',
+        red: 'Красный',
+        серый: 'Серый',
+        зеленый: 'Зеленый',
+        синий: 'Синий',
+        фиолетовый: 'Фиолетовый',
+        золотой: 'Золотой',
+        красный: 'Красный'
+      };
+
+      Object.entries(parsed).forEach(([key, value]) => {
+        const normalizedKey = mapping[String(key).trim().toLowerCase()] || String(key).trim();
+        if (normalizedKey) {
+          normalized[normalizedKey] = Number(value || 0);
+        }
+      });
+
+      return { ...defaults, ...normalized };
+    }
+
+    function getRarityOptionsMarkup(selectedValue = '') {
+      const selected = normalizeRarityValue(selectedValue);
+      const options = [
+        ['Серый', 'Серый'],
+        ['Зеленый', 'Зеленый'],
+        ['Синий', 'Синий'],
+        ['Фиолетовый', 'Фиолетовый'],
+        ['Золотой', 'Золотой'],
+        ['Красный', 'Красный']
+      ];
+      return options
+        .map(([value, label]) => `<option value="${escapeAttribute(value)}" ${selected === value ? 'selected' : ''}>${escapeAttribute(label)}</option>`)
+        .join('');
+    }
+
+    function loadCases() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEYS.cases);
+        if (!raw) return [];
+        const parsed = JSON.parse(raw);
+        return Array.isArray(parsed)
+          ? parsed.map((item) => ({ ...item, chance: normalizeChanceObject(item.chance) }))
+          : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveCases(cases) {
+      localStorage.setItem(STORAGE_KEYS.cases, JSON.stringify(cases));
+      return cases;
+    }
+
+    function loadItems() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEYS.items);
+        return raw ? JSON.parse(raw) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveItems(items) {
+      localStorage.setItem(STORAGE_KEYS.items, JSON.stringify(items));
+      return items;
+    }
+
+    function getDefaultRarityWeights() {
+      return {
+        Серый: 70,
+        Зеленый: 20,
+        Синий: 8,
+        Фиолетовый: 2,
+        Золотой: 0,
+        Красный: 0
+      };
+    }
+
+    function loadRarityWeights() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEYS.rarityWeights);
+        const parsed = raw ? JSON.parse(raw) : null;
+        if (!parsed || typeof parsed !== 'object') {
+          return getDefaultRarityWeights();
+        }
+        const normalizedWeights = {};
+        Object.entries(parsed).forEach(([key, value]) => {
+          const normalizedKey = normalizeRarityValue(key);
+          if (normalizedKey) {
+            normalizedWeights[normalizedKey] = Number(value || 0);
+          }
+        });
+        return { ...getDefaultRarityWeights(), ...normalizedWeights };
+      } catch {
+        return getDefaultRarityWeights();
+      }
+    }
+
+    function saveRarityWeights(weights) {
+      localStorage.setItem(STORAGE_KEYS.rarityWeights, JSON.stringify(weights));
+      return weights;
+    }
+
+    function getRarityCategories() {
+      const categories = new Set(['Серый', 'Зеленый', 'Синий', 'Фиолетовый', 'Золотой', 'Красный']);
+      loadItems().forEach((item) => {
+        if (item.rarity) {
+          categories.add(normalizeRarityValue(item.rarity));
+        }
+      });
+      const storedCases = loadCases();
+      storedCases.forEach((caseData) => {
+        (caseData.rewards || []).forEach((reward) => {
+          if (reward.rarity) {
+            categories.add(normalizeRarityValue(reward.rarity));
+          }
+        });
+      });
+      return Array.from(categories);
+    }
+
+    function buildItemOptions(selectedValue = '') {
+      const items = loadItems();
+      if (!items.length) {
+        return '<option value="">Нет предметов</option>';
+      }
+      return ['<option value="">— Выбрать предмет —</option>']
+        .concat(items.map((item) => {
+          const name = escapeAttribute(item.name || '');
+          const rarity = escapeAttribute(item.rarity || '');
+          return `<option value="${name}" ${item.name === selectedValue ? 'selected' : ''}>${name}${rarity ? ` (${rarity})` : ''}</option>`;
+        }))
+        .join('');
+    }
+
+    function applyItemToRewardRow(row, itemName) {
+      const item = loadItems().find((entry) => entry.name === itemName);
+      if (!item) {
+        return;
+      }
+      const nameInput = row.querySelector('input[name="reward-name"]');
+      const valueInput = row.querySelector('input[name="reward-value"]');
+      const imgInput = row.querySelector('input[name="reward-img"]');
+      const raritySelect = row.querySelector('select[name="reward-rarity"]');
+      if (nameInput) nameInput.value = item.name || nameInput.value;
+      if (valueInput) valueInput.value = Number(item.price || 0);
+      if (imgInput) imgInput.value = item.image || imgInput.value;
+      if (raritySelect && item.rarity) raritySelect.value = item.rarity;
+    }
+
+    async function loadCasesFromSupabase() {
+      if (!supabaseClient) {
+        return { ok: false, message: 'Supabase клиент недоступен.' };
+      }
+
+      const { data: caseRows, error: caseError } = await supabaseClient
+        .from('cases')
+        .select('id, name, price, category, img, chance')
+        .order('id', { ascending: true });
+
+      if (caseError) {
+        return { ok: false, message: caseError.message };
+      }
+
+      const { data: itemRows, error: itemError } = await supabaseClient
+        .from('case_items')
+        .select('case_id, name, price, img, rarity')
+        .order('case_id', { ascending: true });
+
+      const rewardsByCase = new Map();
+      if (!itemError && Array.isArray(itemRows)) {
+        itemRows.forEach((item) => {
+          if (!rewardsByCase.has(item.case_id)) {
+            rewardsByCase.set(item.case_id, []);
+          }
+          rewardsByCase.get(item.case_id).push({
+            name: item.name || '',
+            value: Number(item.price || 0),
+            img: item.img || '',
+            rarity: normalizeRarityValue(item.rarity || 'Серый')
+          });
+        });
+      }
+
+      const cases = (Array.isArray(caseRows) ? caseRows : []).map((item) => ({
+        id: item.id,
+        name: item.name || '',
+        price: Number(item.price || 0),
+        category: item.category || '',
+        img: item.img || '',
+        chance: normalizeChanceObject(item.chance),
+        rewards: Array.isArray(rewardsByCase.get(item.id)) ? rewardsByCase.get(item.id) : []
+      }));
+
+      saveCases(cases);
+      return { ok: true, data: cases, message: 'Кейсы обновлены из Supabase.' };
+    }
+
+    async function loadItemsFromSupabase() {
+      if (!supabaseClient) {
+        return { ok: false, message: 'Supabase клиент недоступен.' };
+      }
+
+      const { data, error } = await supabaseClient
+        .from('items')
+        .select('name, price, rarity, type, image')
+        .order('name', { ascending: true });
+
+      if (error) {
+        return { ok: false, message: error.message };
+      }
+
+      const items = (Array.isArray(data) ? data : []).map((item) => ({
+        name: item.name || '',
+        price: Number(item.price || 0),
+        rarity: normalizeRarityValue(item.rarity || 'Серый'),
+        type: item.type || 'Cosmetic',
+        image: item.image || ''
+      }));
+
+      saveItems(items);
+      return { ok: true, data: items, message: 'Предметы обновлены из Supabase.' };
+    }
+
+    async function refreshAdminDataFromSupabase() {
+      const casesResult = await loadCasesFromSupabase();
+      const itemsResult = await loadItemsFromSupabase();
+
+      const casesData = casesResult.ok && Array.isArray(casesResult.data) && casesResult.data.length > 0
+        ? casesResult.data
+        : loadCases();
+      const itemsData = itemsResult.ok && Array.isArray(itemsResult.data) && itemsResult.data.length > 0
+        ? itemsResult.data
+        : loadItems();
+
+      saveCases(casesData);
+      saveItems(itemsData);
+
+      const editor = document.getElementById('cases-editor');
+      const itemsEditor = document.getElementById('items-editor');
+      editor.innerHTML = '';
+      itemsEditor.innerHTML = '';
+
+      casesData.forEach((caseData) => insertCaseCard(caseData));
+      itemsData.forEach((itemData) => insertItemCard(itemData));
+      refreshCaseEditor();
+      saveItemsFromEditor();
+      refreshRarityEditor();
+
+      return {
+        ok: true,
+        message: [casesResult.message, itemsResult.message].filter(Boolean).join(' | ')
+      };
+    }
+
+    async function syncCasesToSupabase(cases) {
+      if (!supabaseClient) {
+        return { ok: false, message: 'Supabase клиент недоступен.' };
+      }
+
+      const rows = cases.map((item) => ({
+        name: item.name || `case-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        price: Number(item.price || 0),
+        category: item.category || '',
+        img: item.img || '',
+        chance: item.chance || { Серый: 70, Зеленый: 20, Синий: 8, Фиолетовый: 2, Золотой: 0, Красный: 0 }
+      }));
+
+      const { error: casesError } = await supabaseClient
+        .from('cases')
+        .upsert(rows, { onConflict: 'name' });
+
+      if (casesError) {
+        return { ok: false, message: casesError.message };
+      }
+
+      const names = rows.map((item) => item.name);
+      const { data: savedCases, error: fetchError } = await supabaseClient
+        .from('cases')
+        .select('id, name')
+        .in('name', names);
+
+      if (fetchError || !Array.isArray(savedCases)) {
+        return { ok: false, message: fetchError?.message || 'Не удалось получить ids кейсов.' };
+      }
+
+      const caseIdByName = new Map(savedCases.map((item) => [item.name, item.id]));
+      const itemRows = cases.flatMap((item) => {
+        const caseId = caseIdByName.get(item.name || rows.find((row) => row.name === item.name)?.name);
+        if (!caseId) {
+          return [];
+        }
+
+        return (item.rewards || []).map((reward) => ({
+          case_id: caseId,
+          name: reward.name || '',
+          price: Number(reward.value || reward.price || 0),
+          img: reward.img || '',
+          rarity: normalizeRarityValue(reward.rarity || 'Серый')
+        }));
+      });
+
+      const caseIds = Array.from(new Set(savedCases.map((item) => item.id)));
+      if (caseIds.length > 0) {
+        await supabaseClient
+          .from('case_items')
+          .delete()
+          .in('case_id', caseIds);
+      }
+
+      if (itemRows.length > 0) {
+        const { error: itemsError } = await supabaseClient
+          .from('case_items')
+          .insert(itemRows);
+
+        if (itemsError) {
+          return { ok: false, message: itemsError.message };
+        }
+      }
+
+      return { ok: true, message: 'Кейсы и предметы отправлены в Supabase.' };
+    }
+
+    async function syncItemsToSupabase(items) {
+      if (!supabaseClient) {
+        return { ok: false, message: 'Supabase клиент недоступен.' };
+      }
+
+      const rows = items.map((item) => ({
+        name: item.name || `item-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        price: Number(item.price || 0),
+        rarity: normalizeRarityValue(item.rarity || 'Серый'),
+        type: item.type || 'Cosmetic',
+        image: item.image || ''
+      }));
+
+      const { error } = await supabaseClient
+        .from('items')
+        .upsert(rows, { onConflict: 'name' });
+
+      if (error) {
+        return { ok: false, message: error.message };
+      }
+
+      return { ok: true, message: 'Предметы отправлены в Supabase.' };
+    }
+
+    async function syncNewsToSupabase(news) {
+      if (!supabaseClient) {
+        return { ok: false, message: 'Supabase клиент недоступен.' };
+      }
+
+      const rows = news.map((item) => ({
+        title: item.title || `news-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        text: item.text || '',
+        image: item.image || '',
+        pinned: Boolean(item.pinned)
+      }));
+
+      const titles = rows.map((row) => row.title).filter(Boolean);
+      if (titles.length > 0) {
+        const { error: deleteError } = await supabaseClient
+          .from('news')
+          .delete()
+          .in('title', titles);
+
+        if (deleteError) {
+          return { ok: false, message: deleteError.message };
+        }
+      }
+
+      const { error: insertError } = await supabaseClient
+        .from('news')
+        .insert(rows);
+
+      if (insertError) {
+        return { ok: false, message: insertError.message };
+      }
+
+      return { ok: true, message: 'Новости отправлены в Supabase.' };
+    }
+
+    function escapeAttribute(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    function createCaseCard(caseData, index) {
+      const card = document.createElement('div');
+      card.className = 'admin-card';
+      card.dataset.index = index;
+
+      card.innerHTML = `
+        <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center;">
+          <h4>Кейс ${index + 1}</h4>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" data-action="clone">Дублировать</button>
+            <button type="button" data-action="delete">Удалить</button>
+          </div>
+        </div>
+        <div class="admin-grid">
+          <label>
+            Название
+            <input type="text" name="name" value="${caseData.name || ''}" placeholder="Название кейса" />
+          </label>
+          <label>
+            Цена
+            <input type="number" name="price" value="${caseData.price || 0}" min="0" />
+          </label>
+          <label>
+            Категория
+            <input type="text" name="category" value="${caseData.category || ''}" placeholder="Категория кейса" />
+          </label>
+          <label>
+            Изображение кейса
+            <input type="text" name="img" value="${caseData.img || ''}" placeholder="URL или эмодзи" />
+          </label>
+          <label>
+            Шанс Серый
+            <input type="number" name="chance-gray" value="${(caseData.chance?.Серый ?? 70)}" min="0" max="100" />
+          </label>
+          <label>
+            Шанс Зеленый
+            <input type="number" name="chance-green" value="${(caseData.chance?.Зеленый ?? 20)}" min="0" max="100" />
+          </label>
+          <label>
+            Шанс Синий
+            <input type="number" name="chance-blue" value="${(caseData.chance?.Синий ?? 8)}" min="0" max="100" />
+          </label>
+          <label>
+            Шанс Фиолетовый
+            <input type="number" name="chance-purple" value="${(caseData.chance?.Фиолетовый ?? 2)}" min="0" max="100" />
+          </label>
+          <label>
+            Шанс Золотой
+            <input type="number" name="chance-gold" value="${(caseData.chance?.Золотой ?? 0)}" min="0" max="100" />
+          </label>
+          <label>
+            Шанс Красный
+            <input type="number" name="chance-red" value="${(caseData.chance?.Красный ?? 0)}" min="0" max="100" />
+          </label>
+        </div>
+        <div>
+          <h4 style="margin:0 0 10px;">Награды</h4>
+          <div class="reward-list"></div>
+          <div class="reward-actions">
+            <button type="button" data-action="open-reward-picker">Добавить предмет</button>
+          </div>
+        </div>
+
+        <div class="case-profit-panel">
+          <h4 style="margin:0 0 10px;">Анализ окупаемости</h4>
+          <div class="case-profit-grid">
+            <div>
+              <span>Средняя выплата</span>
+              <strong class="case-profit-avg">—</strong>
+            </div>
+            <div>
+              <span>Окупаемость</span>
+              <strong class="case-profit-rate">—</strong>
+            </div>
+            <div>
+              <span>Цена для 45–50%</span>
+              <strong class="case-profit-target">—</strong>
+            </div>
+            <div>
+              <span>Рекомендация</span>
+              <strong class="case-profit-advice">—</strong>
+            </div>
+          </div>
+        </div>
+      `;
+
+      const rewardList = card.querySelector('.reward-list');
+      const rewards = Array.isArray(caseData.rewards) ? caseData.rewards : [];
+      rewards.forEach((reward, rewardIndex) => {
+        rewardList.appendChild(createRewardRow(reward, rewardIndex));
+      });
+
+      if (rewards.length === 0) {
+        rewardList.appendChild(createRewardRow({}, 0));
+      }
+
+      updateCaseProfitability(card);
+
+      card.addEventListener('click', (event) => {
+        const action = event.target.dataset.action || event.target.closest('[data-action]')?.dataset.action;
+        if (!action) return;
+        if (action === 'delete') {
+          card.remove();
+          refreshCaseEditor();
+        }
+        if (action === 'clone') {
+          const current = readCaseFromCard(card);
+          insertCaseCard(current, card.nextSibling);
+          refreshCaseEditor();
+        }
+        if (action === 'add-reward') {
+          rewardList.appendChild(createRewardRow({}, rewardList.children.length));
+          refreshCaseEditor();
+        }
+        if (action === 'open-reward-picker') {
+          openRewardPicker(card);
+        }
+      });
+
+      card.querySelectorAll('input, textarea').forEach((input) => {
+        input.addEventListener('input', () => {
+          refreshCaseEditor();
+        });
+      });
+
+      return card;
+    }
+
+    function createRewardRow(reward = {}, index) {
+      const row = document.createElement('div');
+      row.className = 'reward-row';
+      row.dataset.index = index;
+      row.innerHTML = `
+        <label>
+          Из каталога
+          <select name="reward-item">
+            ${buildItemOptions(reward.name)}
+          </select>
+        </label>
+        <label><span>Имя</span><input type="text" name="reward-name" value="${reward.name || ''}" placeholder="Название предмета" /></label>
+        <label><span>Цена</span><input type="number" name="reward-value" value="${reward.value || 0}" min="0" /></label>
+        <label><span>Редкость</span>
+          <select name="reward-rarity">
+            ${getRarityOptionsMarkup(reward.rarity)}
+          </select>
+        </label>
+        <label><span>Эмодзи</span><input type="text" name="reward-emoji" value="${reward.emoji || ''}" placeholder="🔫" /></label>
+        <label><span>Изображение</span><input type="text" name="reward-img" value="${reward.img || ''}" placeholder="niva.png или эмодзи" /></label>
+        <button type="button" data-action="remove-reward">×</button>
+      `;
+      row.querySelector('[data-action="remove-reward"]').addEventListener('click', () => {
+        row.remove();
+        refreshCaseEditor();
+      });
+      const itemSelect = row.querySelector('select[name="reward-item"]');
+      if (itemSelect) {
+        itemSelect.addEventListener('change', () => {
+          applyItemToRewardRow(row, itemSelect.value);
+          refreshCaseEditor();
+        });
+      }
+      row.querySelectorAll('input, select').forEach((input) => {
+        input.addEventListener('input', () => {
+          refreshCaseEditor();
+          const parentCard = input.closest('.admin-card');
+          if (parentCard) updateCaseProfitability(parentCard);
+        });
+        input.addEventListener('change', () => {
+          refreshCaseEditor();
+          const parentCard = input.closest('.admin-card');
+          if (parentCard) updateCaseProfitability(parentCard);
+        });
+      });
+      return row;
+    }
+
+    function calculateCaseProfitability(caseData) {
+      const price = Number(caseData.price || 0);
+      const rewards = Array.isArray(caseData.rewards) ? caseData.rewards : [];
+      const chance = caseData.chance || { Серый: 70, Зеленый: 20, Синий: 8, Фиолетовый: 2, Золотой: 0, Красный: 0 };
+      if (!rewards.length || price <= 0) {
+        return {
+          avgReward: 0,
+          payback: 0,
+          targetRange: [0, 0],
+          advice: 'Нет данных'
+        };
+      }
+      const byRarity = {};
+      rewards.forEach((reward) => {
+        const rarity = normalizeRarityValue(reward.rarity || 'Серый');
+        const value = Number(reward.value || reward.price || 0);
+        if (value <= 0) return;
+        if (!byRarity[rarity]) {
+          byRarity[rarity] = { sum: 0, count: 0 };
+        }
+        byRarity[rarity].sum += value;
+        byRarity[rarity].count += 1;
+      });
+      const avgByRarity = {};
+      Object.keys(chance).forEach((rarity) => {
+        if (byRarity[rarity] && byRarity[rarity].count > 0) {
+          avgByRarity[rarity] = byRarity[rarity].sum / byRarity[rarity].count;
+        } else {
+          avgByRarity[rarity] = 0;
+        }
+      });
+      const avgReward = Object.entries(chance).reduce((sum, [rarity, chanceValue]) => {
+        return sum + (Number(chanceValue || 0) / 100) * (avgByRarity[rarity] || 0);
+      }, 0);
+      const payback = price > 0 ? (avgReward / price) * 100 : 0;
+      const targetLow = avgReward / 0.50;
+      const targetHigh = avgReward / 0.45;
+      let advice = 'Корректно';
+      if (payback < 45) {
+        advice = 'Цена слишком высокая для окупаемости';
+      } else if (payback > 50) {
+        advice = 'Окупаемость слишком хорошая — можно поднять цену';
+      }
+      return {
+        avgReward,
+        payback,
+        targetRange: [targetLow, targetHigh],
+        advice
+      };
+    }
+
+    function formatRubles(value) {
+      return `${Number(value || 0).toLocaleString('ru-RU', { maximumFractionDigits: 0 })}₽`;
+    }
+
+    function updateCaseProfitability(card) {
+      const caseData = readCaseFromCard(card);
+      const profit = calculateCaseProfitability(caseData);
+      const avgNode = card.querySelector('.case-profit-avg');
+      const rateNode = card.querySelector('.case-profit-rate');
+      const targetNode = card.querySelector('.case-profit-target');
+      const adviceNode = card.querySelector('.case-profit-advice');
+      if (avgNode) {
+        avgNode.textContent = formatRubles(profit.avgReward);
+      }
+      if (rateNode) {
+        rateNode.textContent = `${profit.payback.toFixed(1)}%`;
+        rateNode.classList.remove('case-profit-status-neutral', 'case-profit-status-ok', 'case-profit-status-low', 'case-profit-status-high');
+      }
+      if (adviceNode) {
+        adviceNode.textContent = profit.advice;
+        adviceNode.classList.remove('case-profit-status-neutral', 'case-profit-status-ok', 'case-profit-status-low', 'case-profit-status-high');
+      }
+
+      const statusClass = profit.payback <= 0
+        ? 'case-profit-status-neutral'
+        : profit.payback < 45
+          ? 'case-profit-status-low'
+          : profit.payback <= 50
+            ? 'case-profit-status-ok'
+            : 'case-profit-status-high';
+
+      if (rateNode) {
+        rateNode.classList.add(statusClass);
+      }
+      if (adviceNode) {
+        adviceNode.classList.add(statusClass);
+      }
+      if (avgNode) {
+        avgNode.classList.remove('case-profit-status-neutral', 'case-profit-status-ok', 'case-profit-status-low', 'case-profit-status-high');
+        avgNode.classList.add(statusClass);
+      }
+      if (targetNode) {
+        targetNode.classList.remove('case-profit-status-neutral', 'case-profit-status-ok', 'case-profit-status-low', 'case-profit-status-high');
+        targetNode.classList.add(statusClass);
+      }
+    }
+
+    function readCaseFromCard(card) {
+      const caseData = {
+        name: card.querySelector('input[name="name"]').value.trim(),
+        price: Number(card.querySelector('input[name="price"]').value) || 0,
+        category: card.querySelector('input[name="category"]').value.trim(),
+        img: card.querySelector('input[name="img"]').value.trim(),
+        chance: {
+          Серый: Number(card.querySelector('input[name="chance-gray"]').value) || 0,
+          Зеленый: Number(card.querySelector('input[name="chance-green"]').value) || 0,
+          Синий: Number(card.querySelector('input[name="chance-blue"]').value) || 0,
+          Фиолетовый: Number(card.querySelector('input[name="chance-purple"]').value) || 0,
+          Золотой: Number(card.querySelector('input[name="chance-gold"]').value) || 0,
+          Красный: Number(card.querySelector('input[name="chance-red"]').value) || 0
+        },
+        rewards: []
+      };
+      card.querySelectorAll('.reward-row').forEach((rewardRow) => {
+        caseData.rewards.push({
+          name: rewardRow.querySelector('input[name="reward-name"]').value.trim(),
+          value: Number(rewardRow.querySelector('input[name="reward-value"]').value) || 0,
+          rarity: normalizeRarityValue(rewardRow.querySelector('select[name="reward-rarity"]').value || 'Серый'),
+          emoji: rewardRow.querySelector('input[name="reward-emoji"]').value.trim(),
+          img: rewardRow.querySelector('input[name="reward-img"]').value.trim()
+        });
+      });
+      return caseData;
+    }
+
+    function insertCaseCard(caseData, beforeNode = null) {
+      const card = createCaseCard(caseData, 0);
+      const editor = document.getElementById('cases-editor');
+      editor.insertBefore(card, beforeNode);
+    }
+
+    function renderRarityWeightEditor() {
+      const editor = document.getElementById('rarity-weight-editor');
+      if (!editor) return;
+      const categories = getRarityCategories();
+      const weights = loadRarityWeights();
+      editor.innerHTML = categories
+        .map((rarity) => `
+          <label>
+            ${escapeAttribute(rarity)}
+            <input type="number" name="rarity-weight" data-rarity="${escapeAttribute(rarity)}" value="${Number(weights[rarity] || 0)}" min="0" max="100" />
+          </label>
+        `)
+        .join('');
+      editor.querySelectorAll('input[name="rarity-weight"]').forEach((input) => {
+        input.addEventListener('input', () => {
+          rarityWeights = saveRarityWeights(readRarityWeightsFromEditor());
+        });
+      });
+    }
+
+    function readRarityWeightsFromEditor() {
+      const editor = document.getElementById('rarity-weight-editor');
+      const weights = {};
+      if (!editor) {
+        return getDefaultRarityWeights();
+      }
+      editor.querySelectorAll('input[name="rarity-weight"]').forEach((input) => {
+        const rarity = input.dataset.rarity;
+        const value = Number(input.value || 0);
+        if (rarity) {
+          weights[rarity] = value;
+        }
+      });
+      return { ...getDefaultRarityWeights(), ...weights };
+    }
+
+    function buildItemOptions(selectedValue = '') {
+      const items = loadItems();
+      if (!items.length) {
+        return '<option value="">Нет предметов</option>';
+      }
+      return ['<option value="">— Выбрать предмет —</option>']
+        .concat(items.map((item) => {
+          const name = escapeAttribute(item.name || '');
+          const rarity = escapeAttribute(item.rarity || '');
+          return `<option value="${name}" ${item.name === selectedValue ? 'selected' : ''}>${name}${rarity ? ` (${rarity})` : ''}</option>`;
+        }))
+        .join('');
+    }
+
+    function applyItemToRewardRow(row, itemName) {
+      const item = loadItems().find((entry) => entry.name === itemName);
+      if (!item) {
+        return;
+      }
+      const nameInput = row.querySelector('input[name="reward-name"]');
+      const valueInput = row.querySelector('input[name="reward-value"]');
+      const imgInput = row.querySelector('input[name="reward-img"]');
+      const raritySelect = row.querySelector('select[name="reward-rarity"]');
+      if (nameInput) nameInput.value = item.name || nameInput.value;
+      if (valueInput) valueInput.value = Number(item.price || 0);
+      if (imgInput) imgInput.value = item.image || imgInput.value;
+      if (raritySelect && item.rarity) raritySelect.value = item.rarity;
+    }
+
+    let rewardPickerTarget = null;
+    let rewardPickerSelection = new Set();
+    let rewardPickerFilters = {
+      search: '',
+      sort: 'name',
+      direction: 'asc',
+      rarity: 'all'
+    };
+
+    function openRewardPicker(card) {
+      rewardPickerTarget = card;
+      rewardPickerSelection = new Set(
+        Array.from(card.querySelectorAll('.reward-row input[name="reward-name"]'))
+          .map((input) => input.value.trim())
+          .filter(Boolean)
+      );
+      rewardPickerFilters = {
+        search: '',
+        sort: 'name',
+        direction: 'asc',
+        rarity: 'all'
+      };
+
+      const searchInput = document.getElementById('reward-picker-search');
+      const sortField = document.getElementById('reward-picker-sort-field');
+      const sortDirection = document.getElementById('reward-picker-sort-direction');
+      const filterRarity = document.getElementById('reward-picker-filter-rarity');
+
+      if (searchInput) searchInput.value = '';
+      if (sortField) sortField.value = 'name';
+      if (sortDirection) sortDirection.value = 'asc';
+      if (filterRarity) filterRarity.value = 'all';
+
+      renderRewardPicker();
+      const modal = document.getElementById('reward-picker-modal');
+      if (modal) {
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+      }
+    }
+
+    function closeRewardPicker() {
+      const modal = document.getElementById('reward-picker-modal');
+      if (modal) {
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+      }
+      rewardPickerTarget = null;
+    }
+
+    function getRewardPickerFilters() {
+      const searchInput = document.getElementById('reward-picker-search');
+      const sortField = document.getElementById('reward-picker-sort-field');
+      const sortDirection = document.getElementById('reward-picker-sort-direction');
+      const filterRarity = document.getElementById('reward-picker-filter-rarity');
+
+      rewardPickerFilters = {
+        search: searchInput ? searchInput.value.trim().toLowerCase() : '',
+        sort: sortField ? sortField.value : 'name',
+        direction: sortDirection ? sortDirection.value : 'asc',
+        rarity: filterRarity ? filterRarity.value : 'all'
+      };
+      return rewardPickerFilters;
+    }
+
+    function renderRewardPicker() {
+      const grid = document.getElementById('reward-picker-grid');
+      const filterRarity = document.getElementById('reward-picker-filter-rarity');
+      const selectedCount = document.getElementById('reward-picker-selected-count');
+      if (!grid || !filterRarity || !selectedCount) {
+        return;
+      }
+
+      const items = loadItems();
+      const filters = getRewardPickerFilters();
+      const rarities = Array.from(new Set(items.map((item) => item.rarity).filter(Boolean)));
+
+      filterRarity.innerHTML = [
+        '<option value="all">Все</option>',
+        ...rarities.map((rarity) => `<option value="${escapeAttribute(rarity)}">${escapeAttribute(rarity)}</option>`)
+      ].join('');
+      if (!['all', ...rarities].includes(filters.rarity)) {
+        filterRarity.value = 'all';
+        rewardPickerFilters.rarity = 'all';
+      }
+
+      const filtered = items.filter((item) => {
+        if (filters.rarity !== 'all' && item.rarity !== filters.rarity) {
+          return false;
+        }
+        if (filters.search && !String(item.name || '').toLowerCase().includes(filters.search)) {
+          return false;
+        }
+        return true;
+      });
+
+      const sorted = filtered.slice().sort((a, b) => {
+        const valueA = a[filters.sort] ?? '';
+        const valueB = b[filters.sort] ?? '';
+        if (filters.sort === 'price') {
+          return filters.direction === 'asc'
+            ? Number(valueA) - Number(valueB)
+            : Number(valueB) - Number(valueA);
+        }
+        const textA = String(valueA).toLowerCase();
+        const textB = String(valueB).toLowerCase();
+        const diff = textA.localeCompare(textB, 'ru', { sensitivity: 'base' });
+        return filters.direction === 'asc' ? diff : -diff;
+      });
+
+      grid.innerHTML = sorted
+        .map((item) => {
+          const selected = rewardPickerSelection.has(item.name);
+          const safeName = escapeAttribute(item.name || '');
+          const safeImage = escapeAttribute(item.image || '');
+          const safeRarity = escapeAttribute(item.rarity || '');
+          return `
+            <button type="button" class="reward-picker-item${selected ? ' selected' : ''}" data-item-name="${safeName}">
+              <div class="item-thumb">${safeImage ? `<img src="${safeImage}" alt="${safeName}" />` : ''}</div>
+              <div class="item-name">${safeName}</div>
+              <div class="item-meta">
+                <span>${safeRarity}</span>
+                <span>${Number(item.price || 0).toLocaleString('ru-RU')}₽</span>
+              </div>
+            </button>
+          `;
+        })
+        .join('');
+
+      selectedCount.textContent = `Выбрано: ${rewardPickerSelection.size}`;
+    }
+
+    function toggleRewardPickerItem(itemName) {
+      if (!itemName) {
+        return;
+      }
+      if (rewardPickerSelection.has(itemName)) {
+        rewardPickerSelection.delete(itemName);
+      } else {
+        rewardPickerSelection.add(itemName);
+      }
+      renderRewardPicker();
+    }
+
+    function saveRewardPickerSelection() {
+      if (!rewardPickerTarget) {
+        closeRewardPicker();
+        return;
+      }
+      const rewardList = rewardPickerTarget.querySelector('.reward-list');
+      if (!rewardList) {
+        closeRewardPicker();
+        return;
+      }
+
+      const existingNames = new Set(
+        Array.from(rewardList.querySelectorAll('input[name="reward-name"]'))
+          .map((input) => input.value.trim())
+          .filter(Boolean)
+      );
+
+      loadItems().forEach((item) => {
+        if (rewardPickerSelection.has(item.name) && !existingNames.has(item.name)) {
+          rewardList.appendChild(createRewardRow({
+            name: item.name,
+            value: item.price,
+            rarity: item.rarity,
+            img: item.image
+          }, rewardList.children.length));
+        }
+      });
+
+      refreshCaseEditor();
+      closeRewardPicker();
+    }
+
+    function refreshCaseEditor() {
+      const editor = document.getElementById('cases-editor');
+      const cards = Array.from(editor.children);
+      const cases = cards.map((card) => readCaseFromCard(card));
+      renderSql(cases);
+    }
+
+    function buildStorageCases() {
+      const editor = document.getElementById('cases-editor');
+      return Array.from(editor.children).map((card) => readCaseFromCard(card));
+    }
+
+    function renderSql(cases) {
+      const caseRows = cases
+        .map((item, index) => {
+          const chance = item.chance || { Серый: 70, Зеленый: 20, Синий: 8, Фиолетовый: 2, Золотой: 0, Красный: 0 };
+          const chanceValue = JSON.stringify({
+            Серый: Number(chance.Серый || 0),
+            Зеленый: Number(chance.Зеленый || 0),
+            Синий: Number(chance.Синий || 0),
+            Фиолетовый: Number(chance.Фиолетовый || 0),
+            Золотой: Number(chance.Золотой || 0),
+            Красный: Number(chance.Красный || 0)
+          });
+          return `  ('${item.name.replace(/'/g, "''")}', ${item.price}, '${(item.category || '').replace(/'/g, "''")}', '${(item.img || '').replace(/'/g, "''")}', '${chanceValue.replace(/'/g, "''")}')`;
+        })
+        .join(',\n');
+      const rewardRows = cases
+        .flatMap((item, index) =>
+          (item.rewards || []).map((reward) =>
+            `  (${index + 1}, '${reward.name.replace(/'/g, "''")}', ${Number(reward.value || reward.price || 0)}, '${(reward.img || '').replace(/'/g, "''")}', '${(normalizeRarityValue(reward.rarity || 'Серый')).replace(/'/g, "''")}')`
+          )
+        )
+        .join(',\n');
+
+      const sql = `CREATE TABLE cases (\n  id SERIAL PRIMARY KEY,\n  name TEXT NOT NULL UNIQUE,\n  price INTEGER NOT NULL,\n  category TEXT,\n  img TEXT,\n  chance JSONB NOT NULL DEFAULT '{}'\n);\n\nCREATE TABLE case_items (\n  id SERIAL PRIMARY KEY,\n  case_id INTEGER NOT NULL REFERENCES cases(id) ON DELETE CASCADE,\n  name TEXT NOT NULL,\n  price INTEGER NOT NULL,\n  img TEXT,\n  rarity TEXT\n);\n\nINSERT INTO cases (name, price, category, img, chance) VALUES\n${caseRows};${rewardRows ? `\n\nINSERT INTO case_items (case_id, name, price, img, rarity) VALUES\n${rewardRows};` : ''}`;
+      document.getElementById('sql-output').textContent = sql;
+      return sql;
+    }
+
+    function createItemCard(itemData, index) {
+      const card = document.createElement('div');
+      card.className = 'admin-card item-card';
+      card.dataset.index = index;
+      const safeName = escapeAttribute(itemData.name || `Предмет ${index + 1}`);
+      const safeImage = escapeAttribute(itemData.image || '');
+      const safePrice = escapeAttribute(itemData.price || 0);
+      const safeRarity = escapeAttribute(normalizeRarityValue(itemData.rarity || 'Серый'));
+      const safeType = escapeAttribute(itemData.type || 'Cosmetic');
+
+      card.innerHTML = `
+        <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center;">
+          <h4>${safeName}</h4>
+          <button type="button" data-action="remove-item">Удалить</button>
+        </div>
+        <div class="item-preview-shell">
+          <div class="item-preview ${itemData.image ? '' : 'is-empty'}">
+            <img src="${safeImage}" alt="${safeName}" />
+            <span class="item-preview-placeholder">Нет изображения</span>
+          </div>
+          <div class="item-form-grid">
+            <label class="admin-grid-full">
+              Название
+              <input type="text" name="item-name" value="${escapeAttribute(itemData.name || '')}" placeholder="Название предмета" />
+            </label>
+            <label>
+              Цена
+              <input type="number" name="item-price" value="${safePrice}" min="0" />
+            </label>
+            <label>
+              Редкость
+              <select name="item-rarity">
+                ${getRarityOptionsMarkup(itemData.rarity || 'Серый')}
+              </select>
+            </label>
+            <label>
+              Тип
+              <select name="item-type">
+                <option value="Транспорт" ${safeType === 'Транспорт' ? 'selected' : ''}>Транспорт</option>
+                <option value="Одежда" ${safeType === 'Одежда' ? 'selected' : ''}>Одежда</option>
+                <option value="Аксессуар" ${safeType === 'Аксессуар' ? 'selected' : ''}>Аксессуар</option>
+                <option value="Набор" ${safeType === 'Набор' ? 'selected' : ''}>Набор</option>
+                <option value="Разное" ${safeType === 'Разное' ? 'selected' : ''}>Разное</option>
+              </select>
+            </label>
+            <label class="admin-grid-full">
+              Изображение
+              <input type="text" name="item-image" value="${safeImage}" placeholder="./assets/items/example.png" />
+            </label>
+          </div>
+        </div>
+      `;
+
+      card.querySelector('[data-action="remove-item"]').addEventListener('click', () => {
+        card.remove();
+        saveItemsFromEditor();
+      });
+
+      card.querySelectorAll('input, select').forEach((input) => {
+        input.addEventListener('input', () => {
+          syncItemCardPreview(card);
+          saveItemsFromEditor();
+        });
+        input.addEventListener('change', () => {
+          syncItemCardPreview(card);
+          saveItemsFromEditor();
+        });
+      });
+
+      syncItemCardPreview(card);
+      return card;
+    }
+
+    function syncItemCardPreview(card) {
+      const preview = card.querySelector('.item-preview');
+      const img = card.querySelector('.item-preview img');
+      const placeholder = card.querySelector('.item-preview-placeholder');
+      const imageInput = card.querySelector('input[name="item-image"]');
+      const imagePath = (imageInput ? imageInput.value : '').trim();
+
+      if (!preview || !img || !placeholder) {
+        return;
+      }
+
+      if (!imagePath) {
+        preview.classList.add('is-empty');
+        img.removeAttribute('src');
+        img.style.display = 'none';
+        placeholder.style.display = 'block';
+        return;
+      }
+
+      preview.classList.remove('is-empty');
+      img.src = imagePath;
+      img.style.display = 'block';
+      placeholder.style.display = 'none';
+      img.onerror = () => {
+        preview.classList.add('is-empty');
+        img.style.display = 'none';
+        placeholder.style.display = 'block';
+      };
+    }
+
+    function readItemFromCard(card) {
+      return {
+        name: card.querySelector('input[name="item-name"]').value.trim(),
+        price: Number(card.querySelector('input[name="item-price"]').value) || 0,
+        rarity: card.querySelector('select[name="item-rarity"]').value,
+        type: card.querySelector('select[name="item-type"]').value,
+        image: card.querySelector('input[name="item-image"]').value.trim()
+      };
+    }
+
+    function insertItemCard(itemData, beforeNode = null) {
+      const card = createItemCard(itemData, 0);
+      const editor = document.getElementById('items-editor');
+      editor.insertBefore(card, beforeNode);
+    }
+
+    function buildItemsSql(items) {
+      const itemRows = items
+        .map((item) => `  ('${(item.name || 'Unnamed Item').replace(/'/g, "''")}', ${Number(item.price || 0)}, '${(normalizeRarityValue(item.rarity || 'Серый')).replace(/'/g, "''")}', '${(item.type || 'Cosmetic').replace(/'/g, "''")}', '${(item.image || '').replace(/'/g, "''")}')`)
+        .join(',\n');
+
+      return `CREATE TABLE items (\n  id SERIAL PRIMARY KEY,\n  name TEXT NOT NULL UNIQUE,\n  price INTEGER NOT NULL DEFAULT 0,\n  rarity TEXT NOT NULL,\n  type TEXT NOT NULL,\n  image TEXT NOT NULL\n);\n\nINSERT INTO items (name, price, rarity, type, image) VALUES\n${itemRows};`;
+    }
+
+    function saveItemsFromEditor() {
+      const editor = document.getElementById('items-editor');
+      const items = Array.from(editor.children).map((card) => readItemFromCard(card));
+      saveItems(items);
+      document.getElementById('items-sql-output').textContent = buildItemsSql(items);
+      return items;
+    }
+
+    function loadNews() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEYS.news);
+        return raw ? JSON.parse(raw) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveNews(news) {
+      localStorage.setItem(STORAGE_KEYS.news, JSON.stringify(news));
+      return news;
+    }
+
+    function createNewsCard(newsData, index) {
+      const card = document.createElement('div');
+      card.className = 'admin-card';
+      card.dataset.index = index;
+      const safeTitle = escapeAttribute(newsData.title || `Новость ${index + 1}`);
+      const safeText = escapeAttribute(newsData.text || '');
+      const safeImage = escapeAttribute(newsData.image || '');
+      const safePinned = newsData.pinned ? 'checked' : '';
+
+      card.innerHTML = `
+        <div style="display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap; align-items:center;">
+          <h4>${safeTitle}</h4>
+          <button type="button" data-action="remove-news">Удалить</button>
+        </div>
+        <label>
+          Заголовок
+          <input type="text" name="news-title" value="${safeTitle}" placeholder="Заголовок новости" />
+        </label>
+        <label>
+          Текст
+          <textarea name="news-text" placeholder="Описание новости">${safeText}</textarea>
+        </label>
+        <label>
+          Изображение
+          <input type="text" name="news-image" value="${safeImage}" placeholder="./assets/news/example.png" />
+        </label>
+        <label style="display:flex; align-items:center; gap:10px;">
+          <input type="checkbox" name="news-pinned" ${safePinned} /> Закреплено
+        </label>
+      `;
+
+      card.querySelector('[data-action="remove-news"]').addEventListener('click', () => {
+        card.remove();
+        saveNewsFromEditor();
+      });
+
+      card.querySelectorAll('input, textarea').forEach((input) => {
+        input.addEventListener('input', saveNewsFromEditor);
+        input.addEventListener('change', saveNewsFromEditor);
+      });
+
+      return card;
+    }
+
+    function readNewsFromCard(card) {
+      return {
+        title: card.querySelector('input[name="news-title"]').value.trim(),
+        text: card.querySelector('textarea[name="news-text"]').value.trim(),
+        image: card.querySelector('input[name="news-image"]').value.trim(),
+        pinned: Boolean(card.querySelector('input[name="news-pinned"]')?.checked)
+      };
+    }
+
+    function insertNewsCard(newsData, beforeNode = null) {
+      const card = createNewsCard(newsData, 0);
+      const editor = document.getElementById('news-editor');
+      editor.insertBefore(card, beforeNode);
+    }
+
+    function buildNewsSql(news) {
+      const newsRows = news
+        .map((item) => `  ('${(item.title || '').replace(/'/g, "''")}', '${(item.text || '').replace(/'/g, "''")}', '${(item.image || '').replace(/'/g, "''")}', ${item.pinned ? 'TRUE' : 'FALSE'})`)
+        .join(',\n');
+
+      return `CREATE TABLE news (\n  id SERIAL PRIMARY KEY,\n  title TEXT NOT NULL,\n  text TEXT NOT NULL,\n  image TEXT,\n  pinned BOOLEAN NOT NULL DEFAULT FALSE\n);\n\nINSERT INTO news (title, text, image, pinned) VALUES\n${newsRows};`;
+    }
+
+    function saveNewsFromEditor() {
+      const editor = document.getElementById('news-editor');
+      const news = Array.from(editor.children).map((card) => readNewsFromCard(card));
+      saveNews(news);
+      const output = document.getElementById('news-sql-output');
+      if (output) {
+        output.textContent = buildNewsSql(news);
+      }
+      return news;
+    }
+
+    function sortNewsBy(field, direction = 'asc') {
+      const editor = document.getElementById('news-editor');
+      const news = Array.from(editor.children).map((card) => readNewsFromCard(card));
+      const sorted = [...news].sort((a, b) => {
+        const valueA = a[field] ?? '';
+        const valueB = b[field] ?? '';
+        if (field === 'pinned') {
+          return direction === 'asc' ? Number(valueA) - Number(valueB) : Number(valueB) - Number(valueA);
+        }
+        const textA = String(valueA).toLowerCase();
+        const textB = String(valueB).toLowerCase();
+        const diff = textA.localeCompare(textB, 'ru', { sensitivity: 'base' });
+        return direction === 'asc' ? diff : -diff;
+      });
+      editor.innerHTML = '';
+      sorted.forEach((newsData) => insertNewsCard(newsData));
+      saveNewsFromEditor();
+      return sorted;
+    }
+
+    function initNewsAdmin() {
+      const editor = document.getElementById('news-editor');
+      const stored = loadNews();
+      editor.innerHTML = '';
+      if (!stored.length) {
+        insertNewsCard({
+          title: 'Новая акция',
+          text: 'Добавьте описание новости, чтобы она появилась в блоке.',
+          image: './assets/news/default.png',
+          pinned: false
+        });
+      } else {
+        stored.forEach((newsData) => insertNewsCard(newsData));
+      }
+      saveNewsFromEditor();
+    }
+
+    function refreshNewsEditor() {
+      saveNewsFromEditor();
+    }
+
+    function buildStorageCases() {
+      const editor = document.getElementById('cases-editor');
+      return Array.from(editor.children).map((card) => readCaseFromCard(card));
+    }
+
+    function sortItemsBy(field, direction = 'asc') {
+      const editor = document.getElementById('items-editor');
+      const items = Array.from(editor.children).map((card) => readItemFromCard(card));
+      const sorted = [...items].sort((a, b) => {
+        const valueA = a[field] ?? '';
+        const valueB = b[field] ?? '';
+        if (field === 'price') {
+          const diff = Number(valueA) - Number(valueB);
+          return direction === 'asc' ? diff : -diff;
+        }
+        const textA = String(valueA).toLowerCase();
+        const textB = String(valueB).toLowerCase();
+        const diff = textA.localeCompare(textB, 'ru', { sensitivity: 'base' });
+        return direction === 'asc' ? diff : -diff;
+      });
+
+      editor.innerHTML = '';
+      sorted.forEach((itemData) => insertItemCard(itemData));
+      saveItemsFromEditor();
+      return sorted;
+    }
+
+    function toggleAdminPanel(panelId, buttonId) {
+      const panel = document.getElementById(panelId);
+      const button = document.getElementById(buttonId);
+      if (!panel || !button) return;
+      const collapsed = panel.classList.toggle('collapsed');
+      button.setAttribute('aria-expanded', String(!collapsed));
+      button.textContent = collapsed ? 'Развернуть' : 'Свернуть';
+    }
+
+    const toggleCasesButton = document.getElementById('toggle-cases-panel-btn');
+    const toggleItemsButton = document.getElementById('toggle-items-panel-btn');
+
+    if (toggleCasesButton) {
+      toggleCasesButton.addEventListener('click', () => {
+        toggleAdminPanel('cases-panel', 'toggle-cases-panel-btn');
+      });
+    }
+
+    if (toggleItemsButton) {
+      toggleItemsButton.addEventListener('click', () => {
+        toggleAdminPanel('items-panel', 'toggle-items-panel-btn');
+      });
+    }
+
+    document.getElementById('add-case-btn').addEventListener('click', () => {
+      insertCaseCard({
+        name: '',
+        price: 0,
+        category: '',
+        img: '🎁',
+        chance: { Серый: 70, Зеленый: 20, Синий: 8, Фиолетовый: 2, Золотой: 0, Красный: 0 },
+        rewards: [{ name: '', value: 0, rarity: 'Серый', img: '' }]
+      });
+      refreshCaseEditor();
+    });
+
+    document.getElementById('save-cases-btn').addEventListener('click', async () => {
+      const cases = buildStorageCases();
+      saveCases(cases);
+      renderSql(cases);
+      const syncResult = await syncCasesToSupabase(cases);
+      alert(syncResult.ok ? 'Кейсы сохранены и отправлены в Supabase.' : `Кейсы сохранены локально. Supabase: ${syncResult.message}`);
+    });
+
+    document.getElementById('export-sql-btn').addEventListener('click', () => {
+      const cases = buildStorageCases();
+      const sql = renderSql(cases);
+      navigator.clipboard.writeText(sql).then(() => {
+        alert('SQL экспорт скопирован в буфер обмена.');
+      }).catch(() => {
+        alert('Не удалось скопировать SQL.');
+      });
+    });
+
+    document.getElementById('add-item-btn').addEventListener('click', () => {
+      insertItemCard({
+        name: '',
+        price: 0,
+        rarity: 'Серый',
+        type: 'Cosmetic',
+        image: './assets/items/'
+      });
+      saveItemsFromEditor();
+    });
+
+    document.getElementById('save-items-btn').addEventListener('click', async () => {
+      const items = saveItemsFromEditor();
+      const syncResult = await syncItemsToSupabase(items);
+      alert(syncResult.ok ? 'Предметы сохранены и отправлены в Supabase.' : `Предметы сохранены локально. Supabase: ${syncResult.message}`);
+    });
+
+    document.getElementById('add-news-btn').addEventListener('click', () => {
+      insertNewsCard({
+        title: '',
+        text: '',
+        image: '',
+        pinned: false
+      });
+      saveNewsFromEditor();
+    });
+
+    document.getElementById('save-news-btn').addEventListener('click', async () => {
+      const news = saveNewsFromEditor();
+      const syncResult = await syncNewsToSupabase(news);
+      alert(syncResult.ok ? 'Новости сохранены и отправлены в Supabase.' : `Новости сохранены локально. Supabase: ${syncResult.message}`);
+    });
+
+    document.getElementById('sort-news-btn').addEventListener('click', () => {
+      const field = document.getElementById('news-sort-field').value;
+      const direction = document.getElementById('news-sort-direction').value;
+      sortNewsBy(field, direction);
+    });
+
+    document.getElementById('refresh-from-supabase-btn').addEventListener('click', async () => {
+      const result = await refreshAdminDataFromSupabase();
+      alert(result.message || 'Данные обновлены.');
+    });
+
+    document.getElementById('sort-cases-btn').addEventListener('click', () => {
+      const field = document.getElementById('case-sort-field').value;
+      const direction = document.getElementById('case-sort-direction').value;
+      sortCasesBy(field, direction);
+    });
+
+    document.getElementById('sort-cases-price-asc-btn').addEventListener('click', () => {
+      sortCasesBy('price', 'asc');
+    });
+
+    document.getElementById('sort-cases-price-desc-btn').addEventListener('click', () => {
+      sortCasesBy('price', 'desc');
+    });
+
+    document.getElementById('sort-items-btn').addEventListener('click', () => {
+      const field = document.getElementById('item-sort-field').value;
+      const direction = document.getElementById('item-sort-direction').value;
+      sortItemsBy(field, direction);
+    });
+
+    document.getElementById('sort-items-price-asc-btn').addEventListener('click', () => {
+      sortItemsBy('price', 'asc');
+    });
+
+    document.getElementById('sort-items-price-desc-btn').addEventListener('click', () => {
+      sortItemsBy('price', 'desc');
+    });
+
+    const rewardPickerModal = document.getElementById('reward-picker-modal');
+    if (rewardPickerModal) {
+      rewardPickerModal.addEventListener('click', (event) => {
+        const action = event.target.dataset.action;
+        if (action === 'close-reward-picker') {
+          closeRewardPicker();
+          return;
+        }
+        const itemCard = event.target.closest('.reward-picker-item');
+        if (itemCard) {
+          toggleRewardPickerItem(itemCard.dataset.itemName);
+        }
+      });
+    }
+
+    const rewardPickerSearch = document.getElementById('reward-picker-search');
+    const rewardPickerSortField = document.getElementById('reward-picker-sort-field');
+    const rewardPickerSortDirection = document.getElementById('reward-picker-sort-direction');
+    const rewardPickerFilterRarity = document.getElementById('reward-picker-filter-rarity');
+    const rewardPickerSave = document.getElementById('reward-picker-save-btn');
+    const rewardPickerClear = document.getElementById('reward-picker-clear-btn');
+
+    if (rewardPickerSearch) {
+      rewardPickerSearch.addEventListener('input', renderRewardPicker);
+    }
+    if (rewardPickerSortField) {
+      rewardPickerSortField.addEventListener('change', renderRewardPicker);
+    }
+    if (rewardPickerSortDirection) {
+      rewardPickerSortDirection.addEventListener('change', renderRewardPicker);
+    }
+    if (rewardPickerFilterRarity) {
+      rewardPickerFilterRarity.addEventListener('change', renderRewardPicker);
+    }
+    if (rewardPickerSave) {
+      rewardPickerSave.addEventListener('click', saveRewardPickerSelection);
+    }
+    if (rewardPickerClear) {
+      rewardPickerClear.addEventListener('click', () => {
+        rewardPickerSelection.clear();
+        renderRewardPicker();
+      });
+    }
+
+    function initAdmin() {
+      const stored = loadCases();
+      const editor = document.getElementById('cases-editor');
+      editor.innerHTML = '';
+      if (stored.length === 0) {
+        insertCaseCard({
+          name: 'Starter Case',
+          price: 99,
+          category: 'Starter',
+          img: '🎁',
+          chance: { Серый: 70, Зеленый: 20, Синий: 8, Фиолетовый: 2, Золотой: 0, Красный: 0 },
+          rewards: [
+            { name: 'Glock Paint', value: 450, rarity: 'Серый', img: 'bc.png' },
+            { name: 'Starter Bike', value: 1200, rarity: 'Серый', img: 'skuter.png' },
+            { name: 'Cash Bonus', value: 2500, rarity: 'Серый', img: 'money.png' }
+          ]
+        });
+      } else {
+        stored.forEach((caseData) => insertCaseCard(caseData));
+      }
+      refreshCaseEditor();
+    }
+
+    function initItemsAdmin() {
+      const editor = document.getElementById('items-editor');
+      const stored = loadItems();
+      editor.innerHTML = '';
+      if (stored.length === 0) {
+        insertItemCard({
+          name: 'New Item',
+          price: 1000,
+          rarity: 'Серый',
+          type: 'Cosmetic',
+          image: './assets/items/2106.png'
+        });
+      } else {
+        stored.forEach((itemData) => insertItemCard(itemData));
+      }
+      saveItemsFromEditor();
+    }
+
+    function refreshRarityEditor() {
+      rarityWeights = loadRarityWeights();
+      renderRarityWeightEditor();
+    }
+
+    initAdmin();
+    initItemsAdmin();
+    initNewsAdmin();
+    refreshRarityEditor();
+  </script>
+</body>
+</html>

@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0f18" />
+  <title>Black Russia Cases</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="loading-screen" aria-hidden="true">
+    <div class="loading-logo" aria-label="BR DROP logo">
+      <img src="./assets/brdrop_logo.png" alt="BR DROP" />
+    </div>
+  </div>
+
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand-logo">
+        <img src="./assets/brdrop_logo.png" alt="BR DROP" />
+      </div>
+
+      <div class="topbar-actions">
+        <button class="profile-chip" type="button" aria-label="Профиль игрока">
+          <span class="avatar" id="profile-avatar">BR</span>
+          <span class="profile-meta">
+            <strong id="profile-name">Профиль</strong>
+            <small id="profile-balance">Баланс: 0₽</small>
+          </span>
+        </button>
+      </div>
+    </header>
+
+    <main class="content" id="game-area">
+      <section class="news-banner" aria-label="Новости">
+        <div class="news-banner__controls">
+          <button class="news-banner__arrow" type="button" id="news-prev" aria-label="Предыдущая новость">‹</button>
+          <div class="news-banner__viewport" id="news-viewport"></div>
+          <button class="news-banner__arrow" type="button" id="news-next" aria-label="Следующая новость">›</button>
+        </div>
+      </section>
+
+      <section class="cases-menu" aria-label="Кейсы">
+        <div id="cases-list" class="cases-grid" aria-live="polite"></div>
+      </section>
+    </main>
+
+    <nav class="navbar navbar-bottom" aria-label="Основная навигация">
+      <a class="nav-link active" href="#main">Главное</a>
+      <a class="nav-link" href="#market">Маркет</a>
+      <a class="nav-link" href="#top">Топ</a>
+      <button class="nav-link nav-link--ghost" type="button" id="nav-profile">Профиль</button>
+    </nav>
+
+    <div class="case-modal" id="case-modal" aria-hidden="true">
+      <div class="case-modal__backdrop" data-close-case-modal></div>
+      <div class="case-modal__card" role="dialog" aria-modal="true" aria-label="Открытие кейса">
+        <button class="case-modal__close" type="button" aria-label="Закрыть" data-close-case-modal>×</button>
+
+        <div class="case-modal__image" id="case-modal-image">🎁</div>
+
+        <div class="case-modal__header">
+          <h3 id="case-modal-title">Starter Case</h3>
+          <span class="case-modal__price" id="case-modal-price">99 ₽</span>
+        </div>
+
+        <div class="case-modal__counts" role="group" aria-label="Количество открытий">
+          <button class="case-modal__count active" type="button" data-count="1">x1</button>
+          <button class="case-modal__count" type="button" data-count="2">x2</button>
+          <button class="case-modal__count" type="button" data-count="3">x3</button>
+          <button class="case-modal__count" type="button" data-count="5">x5</button>
+          <button class="case-modal__count" type="button" data-count="10">x10</button>
+        </div>
+
+        <div class="case-modal__actions">
+          <button id="open-case-btn" class="case-modal__action auth-submit" type="button">Открыть</button>
+          <button id="open-case-fast-btn" class="case-modal__action case-modal__action--secondary auth-tab" type="button">Открыть быстро</button>
+        </div>
+
+        <div class="case-modal__items" id="case-modal-items">
+          <div class="case-modal__item">Премиум предмет</div>
+          <div class="case-modal__item">Крутая вещь</div>
+          <div class="case-modal__item">Редкий трофей</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="case-open-modal" class="case-open-modal" aria-hidden="true">
+      <div class="case-open-backdrop" data-close-case-open></div>
+      <div class="case-open-card" role="dialog" aria-modal="true" aria-label="Открытие кейса">
+        <button class="case-open-close" type="button" aria-label="Закрыть" data-close-case-open>×</button>
+        <div class="case-open-header">
+          <div class="case-open-badge">Открытие кейса</div>
+          <h3 id="case-open-title">Starter Case</h3>
+        </div>
+        <div id="case-open-tapes" class="case-open-tapes"></div>
+        <div class="case-open-result" id="case-open-result">
+          <div class="case-open-result-label">Вы выиграли</div>
+          <div class="case-open-result-card">
+            <div class="case-open-result-emoji" id="case-open-result-emoji">💎</div>
+            <div>
+              <div class="case-open-result-name" id="case-open-result-name">Nissan GTR</div>
+              <div class="case-open-result-value" id="case-open-result-value">+18 000₽</div>
+            </div>
+          </div>
+          <button id="case-open-continue-btn" class="case-open-continue" type="button">Забрать</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="auth-modal" id="auth-modal" aria-hidden="true">
+      <div class="auth-modal-backdrop" data-close-auth></div>
+      <section class="auth-panel auth-modal-card" role="dialog" aria-modal="true">
+        <div class="auth-modal-top">
+          <button class="modal-close" type="button" aria-label="Закрыть окно" data-close-auth>×</button>
+        </div>
+
+        <div class="auth-tabs" role="tablist" aria-label="Режим авторизации">
+          <button class="auth-tab active" type="button" data-mode="login">Вход</button>
+          <button class="auth-tab" type="button" data-mode="register">Регистрация</button>
+        </div>
+
+        <form class="auth-form" id="auth-form">
+          <div class="auth-row-inline">
+            <label>
+              <span>Имя</span>
+              <input id="auth-name" type="text" name="name" placeholder="Введите имя" autocomplete="given-name" required />
+            </label>
+            <label>
+              <span>Фамилия</span>
+              <input id="auth-lastname" type="text" name="lastname" placeholder="Введите фамилию" autocomplete="family-name" required />
+            </label>
+          </div>
+          <div class="auth-row">
+            <label>
+              <span>Пароль</span>
+              <input id="auth-password" type="password" name="password" placeholder="Введите пароль" autocomplete="current-password" required />
+            </label>
+          </div>
+
+          <div class="auth-server-actions">
+            <div class="auth-server-row" id="auth-server-row">
+              <div class="auth-server-label">Сервер</div>
+              <button type="button" class="server-trigger" id="server-trigger" aria-haspopup="dialog" aria-expanded="false">
+                <span class="server-selected" id="server-selected">Выбрать</span>
+                <span class="server-arrow">▾</span>
+              </button>
+              <div class="server-modal" id="server-modal" role="dialog" aria-modal="true" aria-label="Выбор сервера" hidden>
+                <div class="server-modal-panel">
+                  <div class="server-modal-top">
+                    <span>Выберите сервер</span>
+                    <button type="button" class="server-modal-close" id="server-modal-close" aria-label="Закрыть">×</button>
+                  </div>
+                  <div class="server-modal-options">
+                    <button type="button" class="server-option" data-server="Red">Red</button>
+                    <button type="button" class="server-option" data-server="Green">Green</button>
+                    <button type="button" class="server-option" data-server="Blue">Blue</button>
+                    <button type="button" class="server-option" data-server="Yellow">Yellow</button>
+                    <button type="button" class="server-option" data-server="Orange">Orange</button>
+                    <button type="button" class="server-option" data-server="Purple">Purple</button>
+                    <button type="button" class="server-option" data-server="Lime">Lime</button>
+                    <button type="button" class="server-option" data-server="Pink">Pink</button>
+                    <button type="button" class="server-option" data-server="Cherry">Cherry</button>
+                    <button type="button" class="server-option" data-server="Black">Black</button>
+                    <button type="button" class="server-option" data-server="Indigo">Indigo</button>
+                    <button type="button" class="server-option" data-server="White">White</button>
+                    <button type="button" class="server-option" data-server="Magenta">Magenta</button>
+                    <button type="button" class="server-option" data-server="Crimson">Crimson</button>
+                    <button type="button" class="server-option" data-server="Gold">Gold</button>
+                    <button type="button" class="server-option" data-server="Azure">Azure</button>
+                    <button type="button" class="server-option" data-server="Platinum">Platinum</button>
+                    <button type="button" class="server-option" data-server="Aqua">Aqua</button>
+                    <button type="button" class="server-option" data-server="Gray">Gray</button>
+                    <button type="button" class="server-option" data-server="Ice">Ice</button>
+                    <button type="button" class="server-option" data-server="Chilli">Chilli</button>
+                    <button type="button" class="server-option" data-server="Choco">Choco</button>
+                    <button type="button" class="server-option" data-server="Moscow">Moscow</button>
+                    <button type="button" class="server-option" data-server="SPB">SPB</button>
+                    <button type="button" class="server-option" data-server="Ufa">Ufa</button>
+                    <button type="button" class="server-option" data-server="Sochi">Sochi</button>
+                    <button type="button" class="server-option" data-server="Kazan">Kazan</button>
+                    <button type="button" class="server-option" data-server="Samara">Samara</button>
+                    <button type="button" class="server-option" data-server="Rostov">Rostov</button>
+                    <button type="button" class="server-option" data-server="Anapa">Anapa</button>
+                    <button type="button" class="server-option" data-server="EKB">EKB</button>
+                    <button type="button" class="server-option" data-server="Krasnodar">Krasnodar</button>
+                    <button type="button" class="server-option" data-server="Arzamas">Arzamas</button>
+                    <button type="button" class="server-option" data-server="Novosib">Novosib</button>
+                    <button type="button" class="server-option" data-server="Grozny">Grozny</button>
+                    <button type="button" class="server-option" data-server="Saratov">Saratov</button>
+                    <button type="button" class="server-option" data-server="Omsk">Omsk</button>
+                    <button type="button" class="server-option" data-server="Irkutsk">Irkutsk</button>
+                    <button type="button" class="server-option" data-server="Volgograd">Volgograd</button>
+                    <button type="button" class="server-option" data-server="Voronezh">Voronezh</button>
+                    <button type="button" class="server-option" data-server="Belgorod">Belgorod</button>
+                    <button type="button" class="server-option" data-server="Makhachkala">Makhachkala</button>
+                    <button type="button" class="server-option" data-server="Vladikavkaz">Vladikavkaz</button>
+                    <button type="button" class="server-option" data-server="Vladivostok">Vladivostok</button>
+                    <button type="button" class="server-option" data-server="Kaliningrad">Kaliningrad</button>
+                    <button type="button" class="server-option" data-server="Chelyabinsk">Chelyabinsk</button>
+                    <button type="button" class="server-option" data-server="Krasnoyarsk">Krasnoyarsk</button>
+                    <button type="button" class="server-option" data-server="Cheboksary">Cheboksary</button>
+                    <button type="button" class="server-option" data-server="Khabarovsk">Khabarovsk</button>
+                    <button type="button" class="server-option" data-server="Perm">Perm</button>
+                    <button type="button" class="server-option" data-server="Tula">Tula</button>
+                    <button type="button" class="server-option" data-server="Ryazan">Ryazan</button>
+                    <button type="button" class="server-option" data-server="Murmansk">Murmansk</button>
+                    <button type="button" class="server-option" data-server="Penza">Penza</button>
+                    <button type="button" class="server-option" data-server="Kursk">Kursk</button>
+                    <button type="button" class="server-option" data-server="Arkhangelsk">Arkhangelsk</button>
+                    <button type="button" class="server-option" data-server="Orenburg">Orenburg</button>
+                    <button type="button" class="server-option" data-server="Kirov">Kirov</button>
+                    <button type="button" class="server-option" data-server="Kemerovo">Kemerovo</button>
+                    <button type="button" class="server-option" data-server="Tyumen">Tyumen</button>
+                    <button type="button" class="server-option" data-server="Tolyatti">Tolyatti</button>
+                    <button type="button" class="server-option" data-server="Ivanovo">Ivanovo</button>
+                    <button type="button" class="server-option" data-server="Stavropol">Stavropol</button>
+                    <button type="button" class="server-option" data-server="Smolensk">Smolensk</button>
+                    <button type="button" class="server-option" data-server="Pskov">Pskov</button>
+                    <button type="button" class="server-option" data-server="Bryansk">Bryansk</button>
+                    <button type="button" class="server-option" data-server="Orel">Orel</button>
+                    <button type="button" class="server-option" data-server="Yaroslavl">Yaroslavl</button>
+                    <button type="button" class="server-option" data-server="Barnaul">Barnaul</button>
+                    <button type="button" class="server-option" data-server="Lipetsk">Lipetsk</button>
+                    <button type="button" class="server-option" data-server="Ulyanovsk">Ulyanovsk</button>
+                    <button type="button" class="server-option" data-server="Yakutsk">Yakutsk</button>
+                    <button type="button" class="server-option" data-server="Tambov">Tambov</button>
+                    <button type="button" class="server-option" data-server="Bratsk">Bratsk</button>
+                    <button type="button" class="server-option" data-server="Astrakhan">Astrakhan</button>
+                    <button type="button" class="server-option" data-server="Chita">Chita</button>
+                    <button type="button" class="server-option" data-server="Kostroma">Kostroma</button>
+                    <button type="button" class="server-option" data-server="Vladimir">Vladimir</button>
+                    <button type="button" class="server-option" data-server="Kaluga">Kaluga</button>
+                    <button type="button" class="server-option" data-server="Novgorod">Novgorod</button>
+                    <button type="button" class="server-option" data-server="Taganrog">Taganrog</button>
+                    <button type="button" class="server-option" data-server="Vologda">Vologda</button>
+                    <button type="button" class="server-option" data-server="Tver">Tver</button>
+                    <button type="button" class="server-option" data-server="Tomsk">Tomsk</button>
+                    <button type="button" class="server-option" data-server="Izhevsk">Izhevsk</button>
+                    <button type="button" class="server-option" data-server="Surgut">Surgut</button>
+                    <button type="button" class="server-option" data-server="Podolsk">Podolsk</button>
+                    <button type="button" class="server-option" data-server="Magadan">Magadan</button>
+                    <button type="button" class="server-option" data-server="Cherepovets">Cherepovets</button>
+                    <button type="button" class="server-option" data-server="Norilsk">Norilsk</button>
+                    <button type="button" class="server-option" data-server="Astana">Astana</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <button class="auth-submit" id="auth-submit" type="submit">Войти</button>
+            <p class="auth-message" id="auth-message" aria-live="polite"></p>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <div id="profile-modal" class="profile-modal" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="profile-modal-backdrop" data-close-profile></div>
+      <div class="profile-modal-card">
+        <button class="modal-close" type="button" aria-label="Закрыть профиль" data-close-profile>×</button>
+
+        <div class="profile-header">
+          <button class="profile-avatar-large" id="profile-avatar-large" type="button" aria-label="Загрузить аватарку" title="Загрузить аватарку">BR</button>
+          <input id="avatar-file-input" type="file" accept="image/webp,image/png,image/jpeg,image/jpg,image/gif" hidden />
+          
+          <div class="profile-nickname">
+            <strong id="profile-nickname-text">PlayerName</strong>
+            <button class="profile-edit-btn" id="profile-edit-name-btn" type="button" aria-label="Редактировать никнейм" title="Редактировать никнейм">✎</button>
+          </div>
+
+          <div class="profile-server">
+            <span id="profile-server-text">Moscow</span>
+            <button class="profile-edit-btn" id="profile-edit-server-btn" type="button" aria-label="Смена сервера" title="Смена сервера">✎</button>
+          </div>
+        </div>
+
+        <div class="profile-stats-bar">
+          <div class="profile-stat">
+            <span class="profile-stat-label">Баланс</span>
+            <strong class="profile-stat-value" id="profile-stats-balance">0₽</strong>
+          </div>
+          <div class="profile-stat-divider"></div>
+          <div class="profile-stat">
+            <span class="profile-stat-label">Статус</span>
+            <strong class="profile-stat-value" id="profile-stats-status">Active</strong>
+          </div>
+        </div>
+
+        <div class="profile-tabs" role="tablist">
+          <button class="profile-tab active" type="button" data-tab="inventory" role="tab" aria-selected="true">Инвентарь</button>
+          <button class="profile-tab" type="button" data-tab="history" role="tab" aria-selected="false">История</button>
+          <button class="profile-tab" type="button" data-tab="bonus" role="tab" aria-selected="false">Бонус</button>
+        </div>
+
+        <div class="profile-content">
+          <div class="profile-tab-content active" data-tab-content="inventory">
+            <div class="inventory-list" id="inventory-list">
+              <p class="empty-state">Инвентарь пуст</p>
+            </div>
+          </div>
+
+          <div class="profile-tab-content" data-tab-content="history">
+            <div class="history-list" id="history-list">
+              <p class="empty-state">История пуста</p>
+            </div>
+          </div>
+
+          <div class="profile-tab-content" data-tab-content="bonus">
+            <div class="bonus-section">
+              <label class="bonus-label">
+                <span>Введите промокод</span>
+                <input id="promo-code-input" type="text" placeholder="Введите промокод" maxlength="20" />
+              </label>
+              <button class="bonus-btn" id="bonus-btn" type="button">Активировать</button>
+              <p class="bonus-message" id="bonus-message" aria-live="polite"></p>
+            </div>
+          </div>
+        </div>
+
+        <button class="profile-logout-btn" id="profile-logout-btn" type="button">Выход</button>
+      </div>
+    </div>
+
+    <div id="sell-item-modal" class="sell-modal" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="sell-modal-backdrop" data-close-sell-item></div>
+      <div class="sell-modal-card">
+        <button class="modal-close" type="button" aria-label="Закрыть продажу" data-close-sell-item>×</button>
+        <div class="sell-modal-visual" id="sell-item-visual">📦</div>
+        <h3 id="sell-item-name">Предмет</h3>
+        <p class="sell-modal-price" id="sell-item-price">0₽</p>
+        <p class="sell-modal-commission" id="sell-item-commission">Комиссия 20%</p>
+        <p class="sell-modal-net" id="sell-item-net">Получите 0₽</p>
+        <div class="sell-modal-actions">
+          <button class="auth-tab sell-modal-btn-cancel" id="sell-item-cancel-btn" type="button" data-close-sell-item>Отмена</button>
+          <button class="auth-submit" id="sell-item-confirm-btn" type="button">Продать</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="result-modal" class="result-modal" aria-hidden="true">
+      <div class="result-card" role="dialog" aria-modal="true" aria-labelledby="result-title">
+        <p class="section-kicker">Результат</p>
+        <h3 id="result-title">Поздравляем</h3>
+        <div class="result-nav-wrapper">
+          <button id="result-prev-btn" class="result-nav-btn" type="button" aria-label="Предыдущий дроп">‹</button>
+          <div class="result-nav-display">
+            <div class="result-nav-panel" id="result-nav-panel">
+              <div class="reward-visual" id="result-selected-visual">
+                <span id="reward-emoji">💎</span>
+              </div>
+              <p id="reward-name" class="reward-name">Nissan GTR</p>
+              <p id="reward-value" class="reward-value">+ 18 000₽</p>
+            </div>
+            <div class="result-counter" id="result-counter">1 / 1</div>
+          </div>
+          <button id="result-next-btn" class="result-nav-btn" type="button" aria-label="Следующий дроп">›</button>
+        </div>
+        <div class="result-actions">
+          <button id="close-modal-btn" class="auth-tab" type="button">Продолжить</button>
+          <button id="result-sell-btn" class="auth-submit" type="button">Продать</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/SplitText.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
